@@ -108,7 +108,7 @@ class PenLogReg(Approx_likelihood):
     paths for generalized linear models via coordinate descent. Journal of Statistical 
     Software, 33(1), 1–22.      
     """
-    def __init__(self, statistics_calc, model, n_simulate, n_folds=10, max_iter = 100000, seed = None):
+    def __init__(self, statistics_calc, model, n_simulate, n_folds=10, cut_point=0., max_iter=100000, seed=None):
         """
     Parameters
     ----------
@@ -131,6 +131,7 @@ class PenLogReg(Approx_likelihood):
         self.model = model
         self.statistics_calc = statistics_calc
         self.n_folds = n_folds
+        self.cut_point = cut_point
         self.n_simulate = n_simulate
         self.seed = seed
         self.max_iter = max_iter
@@ -155,11 +156,12 @@ class PenLogReg(Approx_likelihood):
         # Compute the approximate likelihood for the y_obs given theta
         y = np.append(np.zeros(self.n_simulate),np.ones(self.n_simulate))
         X = np.array(np.concatenate((stat_sim,self.ref_data_stat),axis=0))
-        m = LogitNet(alpha = 1, n_splits = self.n_folds, max_iter = self.max_iter, random_state= self.seed)
+        m = LogitNet(alpha=1, n_splits=self.n_folds, cut_point=self.cut_point,
+                     max_iter=self.max_iter, random_state = self.seed)
         m = m.fit(X, y)
+
         result = np.exp(-np.sum((m.intercept_+np.sum(np.multiply(m.coef_,stat_obs),axis=1)),axis=0))
-        
-        return result
+        return (result, np.insert(m.coef_, 0, m.intercept_))
 
 
     def _simulate_ref_data(self):
