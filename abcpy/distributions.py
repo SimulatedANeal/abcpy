@@ -169,7 +169,8 @@ class Uniform(Distribution):
         
     def pdf(self,x):
         if np.product(np.greater_equal(x,self.lb)*np.less_equal(x,self.ub)):
-            pdf_value = 1/np.product(self.ub-self.lb)
+            temp = self.ub-self.lb
+            pdf_value = 1/np.product(temp[np.nonzero(temp)])
         else:
             pdf_value = 0            
         return pdf_value
