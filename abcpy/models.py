@@ -463,7 +463,8 @@ class StochLorenz95(Model):
             timeseries_initial = timeseries_initial + (k1 + 2*k2 + 2*k3 + k4)/6
             timeseries[:,ind+1] = timeseries_initial
         # Return the solved timeseries at the values in timespan    
-        return timeseries    
+        return timeseries
+
 class Ricker(Model):
     """Ecological model that describes the observed size of animal population over time 
     described in [1].
@@ -497,7 +498,10 @@ class Ricker(Model):
         # Assign parameters
         if isinstance(theta, (list, np.ndarray)):
             if self.set_parameters(theta) == False:
-                raise ValueError("The parameter values are out of the model parameter domain.")   
+                raise ValueError("The parameter values are out of the model parameter domain.")
+        else:
+            self.sample_from_prior()
+
         # Initialize random number generator with provided seed, if None initialize with random seed.
         self.rng = np.random.RandomState(seed)
                     
